@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>计算成功率</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min-3.2.0.css"/>
+    <style type="text/css">
+        body {
+            padding: 20px 20px;
+        }
+
+        .panel {
+            width: 400px;
+            margin: 0 auto;
+            position: relative;
+            top: 50px;
+        }
+
+        .alert {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h4>计算成功率</h4>
+    </div>
+    <div class="panel-body">
+        <div class="form-group">
+            <label>
+                一次成功率(单位%)：
+                <input type="number" class="form-control" id="percentage"/>
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                尝试次数：
+                <input type="number" class="form-control" id="count"/>
+            </label>
+        </div>
+        <button class="btn btn-primary" onclick="calculate()">计算</button>
+        <div class="alert alert-info alert-dismissable" id="alert">
+            <span id="error">提示错误的内容</span>
+            <!--<button class="close" type="button" data-dismiss="alert">&times;</button>-->
+        </div>
+    </div>
+    <div class="panel-footer">
+        <p id="result"></p>
+    </div>
+</div>
+
+<script src="/js/jquery-1.9.0.min.js"></script>
+<script src="/js/bootstrap.min-3.2.0.js"></script>
+<script type="text/javascript">
+    var percentageElement = document.getElementById("percentage");
+    var countElement = document.getElementById("count");
+    var errorElement = document.getElementById("error");
+    var alertElement = document.getElementById("alert");
+    var resultElement = document.getElementById("result");
+
+    function calculate() {
+        var percentage = percentageElement.value / 100;
+        var count = countElement.value;
+
+        if (percentage == null || percentage.length === 0 ||
+            count == null || count.length === 0) {
+            showError("请输入数字！");
+            hideResult();
+            return;
+        }
+
+        if (percentage < 0 || percentage > 1 || count < 0) {
+            showError("请输入合理的数字！");
+            hideResult();
+            return;
+        }
+
+        if (count > 1000000) {
+            showError("次数不能超过1000000！");
+            hideResult();
+            return;
+        }
+
+        var reversePercentage = 1;
+        for (var i = 0; i < count; i++) {
+            reversePercentage *= (1 - percentage);
+        }
+        var result = 1 - reversePercentage;
+
+        var s = (percentage * 100) + "%的成功率做" + count +
+            "次，至少成功一次的概率为：" + (result * 100) + "%";
+        showResult(s);
+        hideAlertPanel();
+    }
+
+    function showResult(result) {
+        resultElement.innerHTML = result;
+    }
+
+    function hideResult() {
+        resultElement.innerHTML = "";
+    }
+
+    function showError(error) {
+        errorElement.innerHTML = error;
+        alertElement.style.display = "block";
+    }
+
+    function hideAlertPanel() {
+        alertElement.style.display = "none";
+    }
+</script>
+</body>
+</html>
