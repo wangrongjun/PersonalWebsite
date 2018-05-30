@@ -12,6 +12,7 @@
     <modules>
         <module>MainPage</module>
         <module>YunPan</module>
+        <module>Note</module>
     </modules>
 
     <properties>
