@@ -42,17 +42,121 @@
             </resource>
             <resource>
                 <directory>src/main/webapp</directory>
-                <!--把 src/main/webapp 下的内容发布到 target/classes/webapp 下-->
+                <!--把 MainPage/src/main/webapp 下的内容发布到 MainPage/target/classes/webapp 下-->
                 <targetPath>webapp</targetPath>
             </resource>
         </resources>
 
         <plugins>
+
+            <!--SpringBoot 插件-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>com.wangrj</groupId>
+                            <artifactId>WebLib</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
+
+            <!--步骤2：解压 WebLib 依赖的 war 文件到 MainPage/target/WebLib_war_temp 下-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.wangrj</groupId>
+                                    <artifactId>WebLib</artifactId>
+                                    <!--<version>1.0-SNAPSHOT</version>-->
+                                    <type>war</type>
+                                    <outputDirectory>${project.build.directory}/WebLib_war_temp</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--步骤3：分别复制 WebLib_war_temp 下的资源文件和 classes 文件到 target/classes/webapp 和 target/classes 下-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-static-files-and-classes-files</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy todir="${project.build.directory}/classes/webapp">
+                                    <fileset dir="${project.build.directory}/WebLib_war_temp">
+                                        <exclude name="WEB-INF/"/>
+                                        <exclude name="META-INF/"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes">
+                                    <fileset dir="${project.build.directory}/WebLib_war_temp/WEB-INF/classes"/>
+                                </copy>
+                                <delete dir="${project.build.directory}/WebLib_war_temp"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-resources-plugin</artifactId>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>copy-resources</id>-->
+            <!--&lt;!&ndash; here the phase you need &ndash;&gt;-->
+            <!--<phase>validate</phase>-->
+            <!--<goals>-->
+            <!--<goal>copy-resources</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<outputDirectory>${project.basedir}/target/classes/webapp</outputDirectory>-->
+            <!--<resources>-->
+            <!--<resource>-->
+            <!--<directory>C:/IDE/ideaIU-project/WebLib/src/main/webapp</directory>-->
+            <!--<filtering>true</filtering>-->
+            <!--</resource>-->
+            <!--</resources>-->
+            <!--</configuration>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-war-plugin</artifactId>-->
+            <!--<version>2.6</version>-->
+            <!--<configuration>-->
+            <!--<overlays>-->
+            <!--<overlay>-->
+            <!--<groupId>com.wangrj</groupId>-->
+            <!--<artifactId>WebLib</artifactId>-->
+            <!--</overlay>-->
+            <!--</overlays>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+
         </plugins>
     </build>
 
