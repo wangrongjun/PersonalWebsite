@@ -13,6 +13,8 @@
         <module>MainPage</module>
         <module>YunPan</module>
         <module>Note</module>
+        <module>../JavaLib</module>
+        <module>../WebLib</module>
     </modules>
 
     <properties>
