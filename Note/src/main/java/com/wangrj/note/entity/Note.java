@@ -1,5 +1,7 @@
 package com.wangrj.note.entity;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,6 +14,7 @@ public class Note {
     @GeneratedValue
     private Integer noteId;
     private String content;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdOn;
 
     @Override
@@ -21,6 +24,9 @@ public class Note {
                 ", content='" + content + '\'' +
                 ", createdOn=" + createdOn +
                 '}';
+    }
+
+    public Note() {
     }
 
     public Note(Integer noteId) {

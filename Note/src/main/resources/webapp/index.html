@@ -44,8 +44,9 @@
         }
 
         .note-item > .box > .content {
-            margin-right: 20px;
+            margin: 0 20px;
             word-break: break-all;
+            flex-grow: 1;
         }
 
         .note-item > .box > .btn-delete {
@@ -56,6 +57,10 @@
 
         .note-item > .box > .btn-delete:hover {
             background-color: #fdf;
+        }
+
+        .note-item > .box > .btn-copy :hover {
+            filter: drop-shadow(0 0 2px #282);
         }
 
     </style>
@@ -69,6 +74,7 @@
     <div class="note-item" v-for="note in noteList">
         <div class="date">{{note.createdOn}}</div>
         <div class="box">
+            <a class="btn-copy" @click="copyToClipboard(note.content)"><img src="img/icon-copy.png" width="20px"></a>
             <p class="content">{{note.content}}</p>
             <a class="btn-delete" href="#"><img src="img/icon-close.png" width="20px"></a>
         </div>
