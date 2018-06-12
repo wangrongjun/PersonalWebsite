@@ -3,8 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <link rel="stylesheet" href="web_lib/css/bootstrap.min-3.2.0.css">
+    <script src="web_lib/js/jquery-1.9.0.min.js"></script>
+    <script src="web_lib/js/bootstrap.min-3.2.0.js"></script>
+    <script src="web_lib/js/jquery.blockUI.js"></script>
+    <script src="web_lib/js/vue.js"></script>
+    <script src="index.js"></script>
+    <style>
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .note-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 20px;
+        }
+
+        .note-item > .date {
+            display: inline-block;
+            text-align: center;
+            background-color: #eee;
+            border-radius: 30px;
+            padding: 2px 20px;
+            box-shadow: 0 0 10px #aaa;
+        }
+
+        .note-item > .box {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 0 0 10px #777;
+        }
+
+        .note-item > .box > .content {
+            margin-right: 20px;
+            word-break: break-all;
+        }
+
+        .note-item > .box > .btn-delete {
+            background-color: #ddf;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #555;
+        }
+
+        .note-item > .box > .btn-delete:hover {
+            background-color: #fdf;
+        }
+
+    </style>
 </head>
 <body>
-Index
+
+<h1 class="text-center">笔记</h1>
+<button class="btn btn-warning" onclick="$('#add_note_modal').modal('toggle')">添加笔记</button>
+
+<div id="root">
+    <div class="note-item" v-for="note in noteList">
+        <div class="date">{{note.createdOn}}</div>
+        <div class="box">
+            <p class="content">{{note.content}}</p>
+            <a class="btn-delete" href="#"><img src="img/icon-close.png" width="20px"></a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add_note_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">添加笔记</h4>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" id="new_content" rows="10" placeholder="请填写笔记内容"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="addNote($('#new_content').val())" data-dismiss="modal">添加
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
