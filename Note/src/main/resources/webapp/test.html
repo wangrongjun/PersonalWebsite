@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="web_lib/js/jquery-1.9.0.min.js"></script>
+    <script src="web_lib/js/util/DateUtil.js"></script>
+</head>
+<body>
+
+Test
+
+<div id="msg">msg</div>
+
+<hr>
+
+<button onclick="request()">request</button>
+
+<script>
+    function request() {
+        $.ajax({
+            url: "/testDate",
+            data: {date: new Date().format("yyyy-MM-dd HH:mm:ss")},
+            success: function (result) {
+                $("#msg").text(result);
+            },
+            error: function (xhr) {
+                $("#msg").text(xhr.responseText);
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
