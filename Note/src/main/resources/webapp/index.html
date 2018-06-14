@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Note123</title>
+    <title>Note</title>
     <link rel="stylesheet" href="web_lib/css/bootstrap.min-3.2.0.css">
     <script src="web_lib/js/jquery-1.9.0.min.js"></script>
     <script src="web_lib/js/bootstrap.min-3.2.0.js"></script>
@@ -45,6 +45,8 @@
 
         .note-item > .box > .content {
             margin: 0 20px;
+            background: none;
+            border: none;
             word-break: break-all;
             flex-grow: 1;
         }
@@ -63,43 +65,69 @@
             filter: drop-shadow(0 0 2px #282);
         }
 
+        .note-item {
+            transition: all 1s;
+            /*display: inline-block;*/
+            /*margin-right: 10px;*/
+        }
+
+        .list-complete-enter, .list-complete-leave-to
+            /* .list-complete-leave-active for below version 2.1.8 */
+        {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .list-complete-leave-active {
+            position: absolute;
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
 
-<h1 class="text-center">笔记</h1>
-<button class="btn btn-warning" onclick="$('#add_note_modal').modal('toggle')">添加笔记</button>
-
 <div id="root">
-    <div class="note-item" v-for="note in noteList">
-        <div class="date">{{note.createdOn}}</div>
-        <div class="box">
-            <a class="btn-copy" @click="copyToClipboard(note.content)"><img src="img/icon-copy.png" width="20px"></a>
-            <p class="content">{{note.content}}</p>
-            <a class="btn-delete" href="#"><img src="img/icon-close.png" width="20px"></a>
-        </div>
-    </div>
-</div>
 
-<div class="modal fade" id="add_note_modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">添加笔记</h4>
+    <h1 class="text-center">笔记</h1>
+    <button class="btn btn-warning" onclick="$('#add_note_modal').modal('toggle')">添加笔记</button>
+
+    <transition-group name="list-complete" tag="p">
+        <div class="note-item" v-for="note in noteList" :key="note.noteId">
+            <div class="date">{{note.createdOn}}</div>
+            <div class="box">
+                <a class="btn-copy" href="javascript:void(0)" @click="copyToClipboard(note.content)">
+                    <img src="img/icon-copy.png" width="20px">
+                </a>
+                <pre class="content">{{note.content}}</pre>
+                <a class="btn-delete" href="javascript:void(0)" @click="deleteNote(note.noteId)">
+                    <img src="img/icon-close.png" width="20px">
+                </a>
             </div>
-            <div class="modal-body">
-                <textarea class="form-control" id="new_content" rows="10" placeholder="请填写笔记内容"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal">取消</button>
-                <button class="btn btn-primary" onclick="addNote($('#new_content').val())" data-dismiss="modal">添加
-                </button>
+        </div>
+    </transition-group>
+
+    <div class="modal fade" id="add_note_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">添加笔记</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" v-model="newNoteContent" rows="10" placeholder="请填写笔记内容"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button class="btn btn-primary" @click="addNote()" data-dismiss="modal">添加
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 </body>

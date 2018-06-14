@@ -3,32 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="web_lib/css/bootstrap.min-3.2.0.css">
     <script src="web_lib/js/jquery-1.9.0.min.js"></script>
-    <script src="web_lib/js/util/DateUtil.js"></script>
+    <script src="web_lib/js/bootstrap.min-3.2.0.js"></script>
+    <script src="web_lib/js/jquery.blockUI.js"></script>
+    <script src="web_lib/js/vue.js"></script>
+    <style>
+        .note_item {
+            color: red;
+        }
+
+        .note_item {
+            transition: all 1s;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .list-complete-enter, .list-complete-leave-to
+            /* .list-complete-leave-active for below version 2.1.8 */
+        {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .list-complete-leave-active {
+            position: absolute;
+        }
+
+    </style>
 </head>
 <body>
 
-Test
-
-<div id="msg">msg</div>
-
-<hr>
-
-<button onclick="request()">request</button>
+<div id="list-complete-demo" class="demo">
+    <button v-on:click="add">Add</button>
+    <button v-on:click="remove">Remove</button>
+    <transition-group name="list-complete" tag="p">
+    <span
+            v-for="item in items"
+            v-bind:key="item"
+            class="note_item"
+    >
+      {{ item }}
+    </span>
+    </transition-group>
+</div>
 
 <script>
-    function request() {
-        $.ajax({
-            url: "/testDate",
-            data: {date: new Date().format("yyyy-MM-dd HH:mm:ss")},
-            success: function (result) {
-                $("#msg").text(result);
+    new Vue({
+        el: '#list-complete-demo',
+        data: {
+            items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            nextNum: 10
+        },
+        methods: {
+            randomIndex: function () {
+                return Math.floor(Math.random() * this.items.length)
             },
-            error: function (xhr) {
-                $("#msg").text(xhr.responseText);
-            }
-        });
-    }
+            add: function () {
+                this.items.splice(this.randomIndex(), 0, this.nextNum++)
+            },
+            remove: function () {
+                this.items.splice(this.randomIndex(), 1)
+            },
+        }
+    })
 </script>
 
 </body>

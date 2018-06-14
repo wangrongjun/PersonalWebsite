@@ -14,7 +14,6 @@ public class Note {
     @GeneratedValue
     private Integer noteId;
     private String content;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdOn;
 
     @Override

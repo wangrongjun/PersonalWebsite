@@ -6,6 +6,8 @@
 
     <artifactId>Note</artifactId>
 
+    <!--打包production: mvn clean package spring-boot:repackage -Dmaven.test.skip=true -P prod -->
+
     <parent>
         <artifactId>PersonalWebsite</artifactId>
         <groupId>com.wangrj</groupId>
