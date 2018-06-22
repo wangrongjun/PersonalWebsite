@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel to Json</title>
+    <link rel="stylesheet" type="text/css" href="/web_lib/css/bootstrap.min-3.2.0.css"/>
+    <script src="/web_lib/js/jquery-1.9.0.min.js"></script>
+    <script src="/web_lib/js/bootstrap.min-3.2.0.js"></script>
+    <script src="/web_lib/js/vue.js"></script>
+</head>
+<body>
+
+<label>Excel:<textarea name="excel" id="excel" cols="70" rows="30"></textarea></label>
+<button onclick="convert()">转换</button>
+<label>Json:<textarea name="json" id="json" cols="70" rows="30"></textarea></label>
+
+<script>
+
+    function convert() {
+        let excel = $("#excel").val();
+        let json = excelToJson(excel);
+        $("#json").val(json);
+    }
+
+    function excelToJson(excel) {
+        let lines = excel.split("\n");
+        for (let line in lines) {
+            console.log(line);
+        }
+        return excel;
+    }
+
+</script>
+
+</body>
+</html>
