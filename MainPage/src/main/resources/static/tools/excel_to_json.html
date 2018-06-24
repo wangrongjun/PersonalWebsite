@@ -3,16 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>Excel to Json</title>
-    <link rel="stylesheet" type="text/css" href="/web_lib/css/bootstrap.min-3.2.0.css"/>
-    <script src="/web_lib/js/jquery-1.9.0.min.js"></script>
-    <script src="/web_lib/js/bootstrap.min-3.2.0.js"></script>
-    <script src="/web_lib/js/vue.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="/web_lib/css/bootstrap.min-3.2.0.css"/>-->
+    <!--<script src="/web_lib/js/jquery-1.9.0.min.js"></script>-->
+    <!--<script src="/web_lib/js/bootstrap.min-3.2.0.js"></script>-->
+    <!--<script src="/web_lib/js/jquery.blockUI.js"></script>-->
+    <!--<script src="/web_lib/js/vue.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="http://malsup.github.io/jquery.blockUI.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        #box {
+            padding: 20px;
+            width: 100%;
+            margin: 0 auto;
+            height: 100%;
+            border: 1px solid red;
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        #btnConvert{
+
+        }
+
+        textarea {
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
 
-<label>Excel:<textarea name="excel" id="excel" cols="70" rows="30"></textarea></label>
-<button onclick="convert()">转换</button>
-<label>Json:<textarea name="json" id="json" cols="70" rows="30"></textarea></label>
+<div id="box">
+    <textarea name="excel" id="excel" placeholder="Excel"></textarea>
+    <br>
+    <button id="btnConvert" onclick="convert()">转换</button>
+    <textarea name="json" id="json" placeholder="Json"></textarea>
+</div>
 
 <script>
 
