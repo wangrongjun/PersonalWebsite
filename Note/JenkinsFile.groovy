@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'cd Note && mvn clean package spring-boot:repackage -Dmaven.test.skip=true -P prod'
+                sh 'cd Note && mvn package spring-boot:repackage -Dmaven.test.skip=true -P prod'
             }
         }
         stage('Deploy') {
