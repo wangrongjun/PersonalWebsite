@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Restart') {
             steps {
-                sh 'ps -aux | grep Note.jar | grep -v grep | awk \'{print $2}\' | xargs kill'
+                sh script: 'ps -aux | grep Note.jar | grep -v grep | awk \'{print $2}\' | xargs kill', returnStatus: true
                 sh 'nohup java -jar /wrj/jar/Note.jar > /wrj/log/Note.log 2>&1 &'
             }
         }
