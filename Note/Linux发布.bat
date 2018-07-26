@@ -1,4 +1,3 @@
-
 rem git clone https://github.com/wangrongjun/PersonalWebsite.git
 cd /wrj/src/PersonalWebsite
 git pull
