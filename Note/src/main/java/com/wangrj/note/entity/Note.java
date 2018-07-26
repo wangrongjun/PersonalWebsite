@@ -1,7 +1,6 @@
 package com.wangrj.note.entity;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,6 +12,7 @@ public class Note {
     @Id
     @GeneratedValue
     private Integer noteId;
+    @Column(columnDefinition = "text")
     private String content;
     private Date createdOn;
 
