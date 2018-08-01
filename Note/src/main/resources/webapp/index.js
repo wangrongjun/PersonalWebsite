@@ -1,4 +1,4 @@
-let rootVm;
+var rootVm;
 
 $(function () {
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
@@ -7,12 +7,12 @@ $(function () {
         el: "#root",
         data: {
             noteList: [],
-            newNoteContent: "",
+            newNoteContent: ""
         },
         methods: {
             copyToClipboard: copyToClipboard,
             addNote: addNote,
-            deleteNote: deleteNote,
+            deleteNote: deleteNote
         }
     });
 
@@ -52,7 +52,7 @@ function addNote() {
 }
 
 function copyToClipboard(content) {
-    let input = document.createElement("textarea");
+    var input = document.createElement("textarea");
     input.value = content;
     document.body.appendChild(input);
     input.select(); // 选择对象
@@ -67,8 +67,8 @@ function deleteNote(noteId) {
             url: "/note/" + noteId,
             type: "DELETE",
             success: function (result) {
-                for (let i = 0; i < rootVm.noteList.length; i++) {
-                    let note = rootVm.noteList[i];
+                for (var i = 0; i < rootVm.noteList.length; i++) {
+                    var note = rootVm.noteList[i];
                     if (note.noteId === noteId) {
                         rootVm.noteList.splice(i, 1);
                         break;
