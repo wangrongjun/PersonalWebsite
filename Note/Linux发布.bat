@@ -1,11 +1,13 @@
-rem git clone https://github.com/wangrongjun/PersonalWebsite.git
+echo git clone https://github.com/wangrongjun/PersonalWebsite.git
+
+ps -aux | grep Note.jar | grep -v grep | awk '{print $2}' | xargs kill
+
 cd /wrj/src/PersonalWebsite
 git pull
 cd Note
 mvn clean package spring-boot:repackage -Dmaven.test.skip=true -P prod
-ps -aux | grep Note.jar | grep -v grep | awk '{print $2}' | xargs kill
 
-sleep 30s
+sleep 10s
 
 \cp target/Note-1.0-SNAPSHOT.jar /wrj/jar/Note.jar
 nohup java -jar /wrj/jar/Note.jar > /wrj/log/Note.log 2>&1 &
