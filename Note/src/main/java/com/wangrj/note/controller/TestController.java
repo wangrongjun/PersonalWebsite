@@ -35,9 +35,13 @@ public class TestController {
     @PostMapping("/testUploadFile")
     @ResponseBody
     public String testUploadFile(String param1, String param2, MultipartFile file1, MultipartFile file2) {
-        String s = param1 + " " + param2 + " \r\n" +
-                file1.getName() + " " + file1.getOriginalFilename() + " \r\n" +
-                file2.getName() + " " + file2.getOriginalFilename();
+        String s = param1 + " " + param2 + " \r\n";
+        if (file1 != null) {
+            s += file1.getName() + " " + file1.getOriginalFilename() + " \r\n";
+        }
+        if (file2 != null) {
+            s += file2.getName() + " " + file2.getOriginalFilename() + " \r\n";
+        }
         return s;
     }
 
