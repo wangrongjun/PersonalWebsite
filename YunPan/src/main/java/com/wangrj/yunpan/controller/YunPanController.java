@@ -2,17 +2,22 @@ package com.wangrj.yunpan.controller;
 
 import com.wangrj.java_lib.java_util.*;
 import com.wangrj.java_lib.math.sort.SortHelper;
-import org.apache.tomcat.util.http.fileupload.FileItem;
+import com.wangrj.yunpan.bean.ApiResponse;
+import com.wangrj.yunpan.bean.FileItem;
+import com.wangrj.yunpan.vo.FileListVO;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,13 +29,20 @@ import java.util.List;
 @Controller
 public class YunPanController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Value("${rootPath}")
+    private String rootPath;
+    @Value("${tempPath}")
+    private String tempPath;
+
     @RequestMapping("/createDirectory")
-    public String createDirectory(HttpServletRequest request, String dirName, String encodedPath) {
-        String path = CharsetUtil.decode(encodedPath);
-        String realDirPath = getRealPath(request, "/admin/file" + path + dirName);
-        boolean succeed = new File(realDirPath).mkdirs();
+    public String createDirectory(String dirName, String parent) {
+        File newDir = new File(rootPath + parent + dirName);
+        logger.info("创建新目录：" + newDir.getAbsolutePath());
+        boolean succeed = newDir.mkdirs();
         if (!succeed) {
-            System.out.println("directory " + realDirPath + " create failed!");
+            logger.info("创建新目录失败：" + newDir.getAbsolutePath());
         }
 //        return "-" + request.getHeader("Referer");
 //        return "-showFileList.do?encodedPath=" + encodedPath;
@@ -38,59 +50,60 @@ public class YunPanController {
     }
 
     @RequestMapping("/deleteFileOrDir")
-    public String deleteFileOrDir(HttpServletRequest request, String encodedPath) {
-        String path = CharsetUtil.decode(encodedPath);
-        String fileDir = getRealPath(request, "/admin/file" + path);
-
-        String password = request.getParameter("password");
-        System.out.println("password: " + password);
+    public ResponseEntity<ApiResponse> deleteFileOrDir(String parentPath, String password, String fileNames) {
+        logger.info("password: " + password);
         password = DataUtil.md5(password);
-        System.out.println("password(md5): " + password);
+        logger.info("password(md5): " + password);
         if ("n0TpVuOit7VZjGJfzIAsNg==".equals(password)) {//密码2143的md5摘要，输入正确才能删除文件
-            String s = request.getParameter("fileNameList");
-            System.out.println(s);
-            String[] fileNameList = s.split("_d_i_v_i_d_e_r_");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("密码错误"));
+        }
 
-            for (String fileName : fileNameList) {
-                if (!TextUtil.isEmpty(fileName)) {
-                    System.out.println("执行文件或目录的删除操作：" + fileDir + fileName);
-                    File deleteFile = new File(fileDir + fileName);
-                    if (deleteFile.isDirectory()) {
-                        FileUtil.deleteDir(deleteFile);
-                    } else {
-                        FileUtil.delete(fileDir + fileName);
-                    }
+        File parentDir = new File(rootPath + parentPath);
+        logger.info("准备删除的文件（目录）列表：" + fileNames);
+        String[] fileNameList = fileNames.split("_d_i_v_i_d_e_r_");
+
+        for (String fileName : fileNameList) {
+            if (!TextUtil.isEmpty(fileName)) {
+                File deleteFile = new File(parentDir + fileName);
+                logger.info("执行文件（目录）的删除操作：" + deleteFile.getAbsolutePath());
+                if (deleteFile.isDirectory()) {
+                    FileUtil.deleteDir(deleteFile);
+                } else {
+                    deleteFile.delete();
                 }
             }
         }
 
-//        return "-" + request.getHeader("Referer");
-        return "test";
+        logger.info("已删除以下文件（目录）：" + fileNames);
+        return ResponseEntity.ok(ApiResponse.ok("删除成功"));
     }
 
-    @RequestMapping("/downloadFolder")
-    @ResponseBody
-    public String downloadFolder(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 String folderPath) throws IOException {
-        folderPath = CharsetUtil.decode(folderPath);// folderPath="/abc/def/"
-        String realFolderPath = getRealPath(request, "/admin/file" + folderPath);
-        System.out.println("Zip realFolderPath: " + realFolderPath);
-        File folder = new File(realFolderPath);
+    @GetMapping("/downloadFolder")
+    public ResponseEntity<ApiResponse<String>> downloadFolder(String folderPath) {
+        File folder = new File(rootPath + folderPath);
+
+//        String realFolderPath = getRealPath(request, "/admin/file" + folderPath);
+
+        logger.info("开始压缩目录：" + folder.getAbsolutePath());
         if (!folder.exists()) {
-            response.getWriter().write("folder not exists");
-            response.setStatus(404);
-            return null;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("目录不存在"));
         }
 
-        String zipFileName;
-        int id = 1;
-        do {
-            zipFileName = (id++) + ".zip";
-        } while (new File(getRealPath(request, "/admin/temp/" + zipFileName)).exists());
-        ZipUtil.compress(realFolderPath, getRealPath(request, "/admin/temp/" + zipFileName));
 
-        return "admin/temp/" + zipFileName;
+        String zipFileName = folder.getName() + ".zip";
+        String zipFilePath = new File(tempPath + zipFileName).getAbsolutePath();
+        int id = 1;
+        while (new File(zipFilePath).exists()) {
+            logger.info("temp目录下已有同名压缩包：" + zipFilePath);
+            zipFileName = folder.getName() + (id++) + ".zip";
+            zipFilePath = new File(tempPath + zipFileName).getAbsolutePath();
+            logger.info("使用新的压缩包名字：" + zipFilePath);
+        }
+
+        ZipUtil.compress(folder.getAbsolutePath(), zipFilePath);
+        logger.info("成功压缩目录 " + folder.getAbsolutePath() + " 到压缩包 " + zipFilePath);
+
+        return ResponseEntity.ok(ApiResponse.data("/" + tempPath + zipFileName));
     }
 
     @GetMapping("/getFolderList")
@@ -158,16 +171,17 @@ public class YunPanController {
     }
 
     @GetMapping("/showFileList")
-    public String showFileList(HttpServletRequest request,
-                               @RequestParam(defaultValue = "0") int sortType,
-                               @RequestParam(defaultValue = "/") String encodedPath) {
+    public ResponseEntity<ApiResponse<FileListVO>> showFileList(
+            @RequestParam(defaultValue = "0") int sortType,
+            @RequestParam(defaultValue = "/") String encodedPath) {
+
         if (sortType >= SortType.values().length) {
             throw new IllegalArgumentException("sortType " + sortType + " not exists");
         }
 
         String path = CharsetUtil.decode(encodedPath);// path的第一个和最后一个字符都为反斜杠
         String relativePath = "/admin/file" + path;
-        String currentPath = getRealPath(request, relativePath);
+        String currentPath = rootPath + relativePath;
 
         // 获取目录列表
         File[] files = new File(currentPath).listFiles(File::isDirectory);
@@ -205,10 +219,10 @@ public class YunPanController {
 
         // 根据path获取每一级的地址（页面的地址索引）
         String[] strings = path.split("/");
-        List<String> addressList = new ArrayList<>();
-        for (String address : strings) {
-            if (!TextUtil.isEmpty(address)) {
-                addressList.add(address);
+        List<String> navigateList = new ArrayList<>();
+        for (String navigate : strings) {
+            if (!TextUtil.isEmpty(navigate)) {
+                navigateList.add(navigate);
             }
         }
 
@@ -217,31 +231,25 @@ public class YunPanController {
         dirFileList.addAll(dirList);
         dirFileList.addAll(fileList);
 
-        request.setAttribute("fileItemList", com.wangrj.yunpan.view.FileItem.toFileItemList(dirFileList));
-        request.setAttribute("addressList", addressList);
-        request.setAttribute("encodedPath", CharsetUtil.encode(encodedPath));
-        request.setAttribute("relativePath", relativePath);
-
-        return "file.jsp";
+        FileListVO vo = new FileListVO(FileItem.toFileItemList(dirFileList), navigateList, encodedPath, relativePath);
+        return ResponseEntity.ok(ApiResponse.data(vo));
     }
 
     @PostMapping("/uploadFile")
     public String uploadFile(HttpServletRequest request) {
-//        request.setCharacterEncoding("utf-8");
-
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload sfu = new ServletFileUpload(factory);
         try {
             // TODO
 //            List<FileItem> fileItemList = sfu.parseRequest(request);
-            List<FileItem> fileItemList = null;
+            List<org.apache.tomcat.util.http.fileupload.FileItem> fileItemList = null;
 
-            FileItem encodedPathItem = fileItemList.get(0);
+            org.apache.tomcat.util.http.fileupload.FileItem encodedPathItem = fileItemList.get(0);
             String path = CharsetUtil.decode(encodedPathItem.getString());
             String fileDir = getRealPath(request, "/admin/file" + path);
             LogUtil.print(fileDir);
 
-            FileItem uploadFileItem = fileItemList.get(1);
+            org.apache.tomcat.util.http.fileupload.FileItem uploadFileItem = fileItemList.get(1);
             long totalSize = uploadFileItem.getSize();
             String fileName = TextUtil.getTextAfterLastSlash(uploadFileItem.getName());
             if (TextUtil.isEmpty(fileName)) {

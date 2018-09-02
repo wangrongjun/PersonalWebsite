@@ -1,4 +1,4 @@
-package com.wangrj.yunpan.view;
+package com.wangrj.yunpan.bean;
 
 import com.wangrj.java_lib.java_util.DateUtil;
 import com.wangrj.java_lib.java_util.TextUtil;
