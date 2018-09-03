@@ -40,6 +40,12 @@ public class YunPanController {
             @RequestParam(defaultValue = "0") int sortType,
             @RequestParam(defaultValue = "/") String path) {
 
+        File rootFile = new File(rootPath);
+        logger.info("rootPath: " + rootFile.getAbsolutePath());
+        if (!rootFile.exists()) {
+            rootFile.mkdirs();
+        }
+
         if (sortType >= SortType.values().length) {
             throw new IllegalArgumentException("sortType " + sortType + " not exists");
         }
