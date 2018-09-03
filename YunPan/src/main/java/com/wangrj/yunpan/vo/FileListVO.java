@@ -11,17 +11,14 @@ public class FileListVO {
 
     private List<FileItem> fileItemList;
     private List<String> navigateList;
-    private String encodedPath;
-    private String relativePath;
+    private String rootPath;
 
     public FileListVO() {
     }
 
-    public FileListVO(List<FileItem> fileItemList, List<String> navigateList, String encodedPath, String relativePath) {
+    public FileListVO(List<FileItem> fileItemList, List<String> navigateList) {
         this.fileItemList = fileItemList;
         this.navigateList = navigateList;
-        this.encodedPath = encodedPath;
-        this.relativePath = relativePath;
     }
 
     public List<FileItem> getFileItemList() {
@@ -38,21 +35,5 @@ public class FileListVO {
 
     public void setNavigateList(List<String> navigateList) {
         this.navigateList = navigateList;
-    }
-
-    public String getEncodedPath() {
-        return encodedPath;
-    }
-
-    public void setEncodedPath(String encodedPath) {
-        this.encodedPath = encodedPath;
-    }
-
-    public String getRelativePath() {
-        return relativePath;
-    }
-
-    public void setRelativePath(String relativePath) {
-        this.relativePath = relativePath;
     }
 }

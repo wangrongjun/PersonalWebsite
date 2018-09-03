@@ -5,8 +5,6 @@ import com.wangrj.java_lib.math.sort.SortHelper;
 import com.wangrj.yunpan.bean.ApiResponse;
 import com.wangrj.yunpan.bean.FileItem;
 import com.wangrj.yunpan.vo.FileListVO;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,11 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,7 +92,7 @@ public class YunPanController {
         dirFileList.addAll(dirList);
         dirFileList.addAll(fileList);
 
-        FileListVO vo = new FileListVO(FileItem.toFileItemList(dirFileList), navigateList, path, path);
+        FileListVO vo = new FileListVO(FileItem.toFileItemList(dirFileList), navigateList);
         return ResponseEntity.ok(ApiResponse.data(vo));
     }
 
@@ -232,52 +231,19 @@ public class YunPanController {
     }
 
     @PostMapping("/uploadFile")
-    public String uploadFile(HttpServletRequest request) {
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        ServletFileUpload sfu = new ServletFileUpload(factory);
-        try {
-            // TODO
-//            List<FileItem> fileItemList = sfu.parseRequest(request);
-            List<org.apache.tomcat.util.http.fileupload.FileItem> fileItemList = null;
-
-            org.apache.tomcat.util.http.fileupload.FileItem encodedPathItem = fileItemList.get(0);
-            String path = CharsetUtil.decode(encodedPathItem.getString());
-            String fileDir = getRealPath(request, "/admin/file" + path);
-            LogUtil.print(fileDir);
-
-            org.apache.tomcat.util.http.fileupload.FileItem uploadFileItem = fileItemList.get(1);
-            long totalSize = uploadFileItem.getSize();
-            String fileName = TextUtil.getTextAfterLastSlash(uploadFileItem.getName());
-            if (TextUtil.isEmpty(fileName)) {
-                System.out.println("File name is null!!!");
-                return "-" + request.getHeader("Referer");
-            }
-
-            System.out.println("------- Start Upload File: " + fileDir + fileName + " ---------");
-
-            InputStream is = uploadFileItem.getInputStream();
-            FileOutputStream fos = new FileOutputStream(fileDir + fileName);
-            byte[] b = new byte[1024];
-            int len;
-            long previousTime = System.currentTimeMillis();
-            long currentSize = 0;
-            while ((len = is.read(b)) != -1) {
-                fos.write(b, 0, len);
-                currentSize += len;
-                if (System.currentTimeMillis() - previousTime >= 1000) {//过了一秒钟
-                    previousTime = System.currentTimeMillis();
-                }
-            }
-            is.close();
-            fos.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public ResponseEntity<ApiResponse> uploadFile(MultipartFile uploadFile) throws IOException {
+        byte[] bytes = uploadFile.getBytes();
+        String fileName = uploadFile.getOriginalFilename();
+        if (TextUtil.isBlank(fileName)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("没有选择文件"));
         }
-
-        System.out.println("---------- Upload File Finish -----------");
-
-        return "-" + request.getHeader("Referer");
+        File file = new File(rootPath + fileName);
+        logger.info("正在保存上传的文件：" + file.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(bytes);
+        fos.flush();
+        fos.close();
+        return ResponseEntity.ok(ApiResponse.ok());
     }
 
     private String getRealPath(HttpServletRequest request, String path) {

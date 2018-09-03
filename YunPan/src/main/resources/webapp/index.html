@@ -87,12 +87,12 @@
                     <a href="javascript:void(0);" onclick="mkdir('${encodedPath}')">新建文件夹</a>
                 </li>
             </ul>
-            <form class="navbar-form" method="post" action="/uploadFile" enctype="multipart/form-data">
+            <form id="uploadFileForm" class="navbar-form" enctype="multipart/form-data">
                 <div class="form-group">
                     <input type="hidden" name="encodedPath" value="${encodedPath}">
-                    <input type="file" class="form-control" name="file">
-                    <input onclick="showProgress()" type="submit" class="btn btn-primary" value="上传"> <br/>
+                    <input type="file" class="form-control" name="uploadFile">
                 </div>
+                <input type="button" class="btn btn-primary" onclick="uploadNewFile()" value="上传">
             </form>
         </div>
     </div>
@@ -136,40 +136,38 @@
             </thead>
             <tbody>
 
-            <div v-for="item in fileItemList">
+            <tr v-for="(item, index) in fileItemList" click="chooseFile(index)">
                 <!--<c:set var="name" value="${item.name}"/>-->
                 <!--<c:set var="isDir" value="${item.directory}"/>-->
                 <!--<c:set var="fileHref" value="${relativePath}${name}"/>-->
                 <!--<c:set var="dirHref" value="file.jsp?encodedPath=${encodedPath}${name}%2F"/>-->
-                <tr click="chooseFile(index)">
-                    <!--多选按钮-->
-                    <td>
-                        <input type="checkbox" click="chooseFile(index)" class="cbFile" :fileName="item.name"/>
-                    </td>
-                    <!--序号-->
-                    <td>{{index+1}}</td>
-                    <!--文件名和图标-->
-                    <td>
-                        <div class="img_type_box"><img id="img_type" :src="item.iconUrl"></div>
-                        <a href="item.directory ? ('file.jsp?encodedPath=' + encodedPath + item.name + '%2F') : (relativePath + item.name)"
-                           :target="item.directory ? '_self' : '_blank'">{{item.name}}</a>
-                    </td>
-                    <!--文件大小-->
-                    <td>{{item.directory ? "-" : item.size}}</td>
-                    <!--创建时间-->
-                    <td>{{item.lastModifiedDate}}</td>
-                    <!--操作按钮-->
-                    <td>
-                        <a :href="item.directory ? '#' : (relativePath + item.name)" target="_blank"
-                           class="btn btn-info btn-xs"
-                           :download="item.name">下载</a>
-                        <a href="javascript:void(0);" @click="confirmDeleteFileOrDir(item, encodedPath)"
-                           class="btn btn-danger btn-xs">删除</a>
-                        <a href="javascript:void(0);" @click="chooseDirToMove(encodedPath + item.name)"
-                           class="btn btn-warning btn-xs">移动</a>
-                    </td>
-                </tr>
-            </div>
+                <!--多选按钮-->
+                <td>
+                    <input type="checkbox" :click="chooseFile(index)" class="cbFile" :fileName="item.name"/>
+                </td>
+                <!--序号-->
+                <td>{{index+1}}</td>
+                <!--文件名和图标-->
+                <td>
+                    <div class="img_type_box"><img id="img_type" :src="item.iconUrl"></div>
+                    <a :href="item.directory ? '#' : ('/' + item.name)"
+                       :target="item.directory ? '_self' : '_blank'">{{item.name}}</a>
+                </td>
+                <!--文件大小-->
+                <td>{{item.directory ? "-" : item.size}}</td>
+                <!--创建时间-->
+                <td>{{item.lastModifiedDate}}</td>
+                <!--操作按钮-->
+                <td>
+                    <a :href="item.directory ? '#' : ('/' + item.name)"
+                       class="btn btn-info btn-xs"
+                       :download="item.name">下载</a>
+                    <a href="javascript:void(0);" @click="confirmDeleteFileOrDir(item, encodedPath)"
+                       class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:void(0);" @click="chooseDirToMove(encodedPath + item.name)"
+                       class="btn btn-warning btn-xs">移动</a>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
