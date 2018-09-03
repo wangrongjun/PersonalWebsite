@@ -36,6 +36,67 @@ public class YunPanController {
     @Value("${tempPath}")
     private String tempPath;
 
+    @GetMapping("/showFileList")
+    public ResponseEntity<ApiResponse<FileListVO>> showFileList(
+            @RequestParam(defaultValue = "0") int sortType,
+            @RequestParam(defaultValue = "/") String path) {
+
+        if (sortType >= SortType.values().length) {
+            throw new IllegalArgumentException("sortType " + sortType + " not exists");
+        }
+
+        // 获取目录列表
+        File[] files = new File(rootPath + path).listFiles(File::isDirectory);
+        if (files == null) {
+            files = new File[0];
+        }
+        List<File> dirList = Arrays.asList(files);
+
+        // 获取文件列表
+        files = new File(rootPath + path).listFiles(file -> !file.isDirectory());
+        if (files == null) {
+            files = new File[0];
+        }
+        List<File> fileList = Arrays.asList(files);
+
+        // 对目录和文件按条件排序
+        SortHelper.sortInsertion(fileList, (file1, file2) -> {
+            switch (SortType.values()[sortType]) {
+                case SORT_BY_NAME:
+                    return TextUtil.compareChinaPinYin(file1.getName(), file2.getName());
+                case SORT_BY_NAME_DESC:
+                    return TextUtil.compareChinaPinYin(file2.getName(), file1.getName());
+                case SORT_BY_SIZE:
+                    return file1.length() <= file2.length() ? -1 : 1;
+                case SORT_BY_SIZE_DESC:
+                    return file1.length() > file2.length() ? -1 : 1;
+                case SORT_BY_TIME:
+                    return file1.lastModified() <= file2.lastModified() ? -1 : 1;
+                case SORT_BY_TIME_DESC:
+                    return file1.lastModified() > file2.lastModified() ? -1 : 1;
+                default:
+                    return 0;
+            }
+        });
+
+        // 根据path获取每一级的地址（页面的地址索引）
+        String[] strings = path.split("/");
+        List<String> navigateList = new ArrayList<>();
+        for (String navigate : strings) {
+            if (!TextUtil.isEmpty(navigate)) {
+                navigateList.add(navigate);
+            }
+        }
+
+        // 合并目录列表和文件列表
+        List<File> dirFileList = new ArrayList<>();
+        dirFileList.addAll(dirList);
+        dirFileList.addAll(fileList);
+
+        FileListVO vo = new FileListVO(FileItem.toFileItemList(dirFileList), navigateList, path, path);
+        return ResponseEntity.ok(ApiResponse.data(vo));
+    }
+
     @RequestMapping("/createDirectory")
     public String createDirectory(String dirName, String parent) {
         File newDir = new File(rootPath + parent + dirName);
@@ -168,71 +229,6 @@ public class YunPanController {
         SORT_BY_TIME_DESC,
         SORT_BY_SIZE,
         SORT_BY_SIZE_DESC
-    }
-
-    @GetMapping("/showFileList")
-    public ResponseEntity<ApiResponse<FileListVO>> showFileList(
-            @RequestParam(defaultValue = "0") int sortType,
-            @RequestParam(defaultValue = "/") String encodedPath) {
-
-        if (sortType >= SortType.values().length) {
-            throw new IllegalArgumentException("sortType " + sortType + " not exists");
-        }
-
-        String path = CharsetUtil.decode(encodedPath);// path的第一个和最后一个字符都为反斜杠
-        String relativePath = "/admin/file" + path;
-        String currentPath = rootPath + relativePath;
-
-        // 获取目录列表
-        File[] files = new File(currentPath).listFiles(File::isDirectory);
-        if (files == null) {
-            files = new File[0];
-        }
-        List<File> dirList = Arrays.asList(files);
-
-        // 获取文件列表
-        files = new File(currentPath).listFiles(File::isDirectory);
-        if (files == null) {
-            files = new File[0];
-        }
-        List<File> fileList = Arrays.asList(files);
-
-        // 对目录和文件按条件排序
-        SortHelper.sortInsertion(fileList, (file1, file2) -> {
-            switch (SortType.values()[sortType]) {
-                case SORT_BY_NAME:
-                    return TextUtil.compareChinaPinYin(file1.getName(), file2.getName());
-                case SORT_BY_NAME_DESC:
-                    return TextUtil.compareChinaPinYin(file2.getName(), file1.getName());
-                case SORT_BY_SIZE:
-                    return file1.length() <= file2.length() ? -1 : 1;
-                case SORT_BY_SIZE_DESC:
-                    return file1.length() > file2.length() ? -1 : 1;
-                case SORT_BY_TIME:
-                    return file1.lastModified() <= file2.lastModified() ? -1 : 1;
-                case SORT_BY_TIME_DESC:
-                    return file1.lastModified() > file2.lastModified() ? -1 : 1;
-                default:
-                    return 0;
-            }
-        });
-
-        // 根据path获取每一级的地址（页面的地址索引）
-        String[] strings = path.split("/");
-        List<String> navigateList = new ArrayList<>();
-        for (String navigate : strings) {
-            if (!TextUtil.isEmpty(navigate)) {
-                navigateList.add(navigate);
-            }
-        }
-
-        // 合并目录列表和文件列表
-        List<File> dirFileList = new ArrayList<>();
-        dirFileList.addAll(dirList);
-        dirFileList.addAll(fileList);
-
-        FileListVO vo = new FileListVO(FileItem.toFileItemList(dirFileList), navigateList, encodedPath, relativePath);
-        return ResponseEntity.ok(ApiResponse.data(vo));
     }
 
     @PostMapping("/uploadFile")

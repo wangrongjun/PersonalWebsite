@@ -12,20 +12,21 @@ $(function () {
             relativePath: ""
         },
         methods: {
-            copyToClipboard: copyToClipboard,
-            addNote: addNote,
-            deleteNote: deleteNote
+            chooseFile: chooseFile,
+            confirmDeleteFileOrDir: confirmDeleteFileOrDir,
+            chooseDirToMove: chooseDirToMove
         }
     });
 
-    showNoteList();
+    showFileList();
 });
 
-function showNoteList() {
+function showFileList() {
     $.ajax({
         url: "/showFileList",
         type: "GET",
         success: function (result) {
+            alert(JSON.stringify(result.data));
             rootVm.fileItemList = result.data.fileItemList;
             rootVm.navigateList = result.data.navigateList;
             rootVm.encodedPath = result.data.encodedPath;
