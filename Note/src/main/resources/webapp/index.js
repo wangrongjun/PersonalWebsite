@@ -12,19 +12,17 @@ $(function () {
         methods: {
             copyToClipboard: copyToClipboard,
             addNote: addNote,
-            deleteNote: deleteNote
+            deleteNote: deleteNote,
+            toHtml: toHtml
         },
-        watch: {
-            noteList: function () {
-                for (var note of rootVm.noteList) {
-                    note.content = note.content.replace(/(http[s]?:\/\/.+)/g, "<a href='$1' target='_blank'>$1</a>");
-                }
-            }
-        }
     });
 
     showNoteList();
 });
+
+function toHtml(content) {
+    return content.replace(/(http[s]?:\/\/.+)/g, "<a href='$1' target='_blank'>$1</a>");
+}
 
 function showNoteList() {
     $.ajax({
