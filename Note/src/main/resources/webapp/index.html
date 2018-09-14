@@ -99,7 +99,7 @@
                 <a class="btn-copy" href="javascript:void(0)" @click="copyToClipboard(note.content)">
                     <img src="img/icon-copy.png" width="20px">
                 </a>
-                <pre class="content">{{note.content}}</pre>
+                <pre class="content" v-html="note.content"></pre>
                 <a class="btn-delete" href="javascript:void(0)" @click="deleteNote(note.noteId)">
                     <img src="img/icon-close.png" width="20px">
                 </a>

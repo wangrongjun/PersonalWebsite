@@ -13,6 +13,13 @@ $(function () {
             copyToClipboard: copyToClipboard,
             addNote: addNote,
             deleteNote: deleteNote
+        },
+        watch: {
+            noteList: function () {
+                for (var note of rootVm.noteList) {
+                    note.content = note.content.replace(/(http[s]?:\/\/.+)/g, "<a href='$1'>$1</a>");
+                }
+            }
         }
     });
 
