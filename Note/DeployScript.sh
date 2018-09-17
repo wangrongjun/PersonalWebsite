@@ -1,4 +1,6 @@
 echo git clone https://github.com/wangrongjun/PersonalWebsite.git
+echo git clone https://github.com/wangrongjun/JavaLib.git
+echo git clone https://github.com/wangrongjun/WebLib.git
 
 ps -aux | grep Note.jar | grep -v grep | awk '{print $2}' | xargs kill
 
