@@ -1,5 +1,6 @@
 package com.wangrj.note.config;
 
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler({
             ServletException.class,
+            TypeMismatchException.class,
             ConstraintViolationException.class,
     })
     public ResponseEntity<String> handleParamErrorException(Exception e) {
