@@ -63,7 +63,8 @@ function copyToClipboard(content) {
     input.select(); // 选择对象
     document.execCommand("Copy"); // 执行浏览器复制命令
     document.body.removeChild(input);
-    alert('复制成功');
+    // alert('复制成功');
+    toastInfo("复制成功")
 }
 
 function deleteNote(noteId) {
@@ -86,4 +87,16 @@ function deleteNote(noteId) {
             }
         });
     }
+}
+
+function toastInfo(text) {
+    bootoast.toast({
+        message: text,
+        type: 'info',
+        position: 'top-center',
+        icon: undefined,
+        timeout: 3,
+        animationDuration: 300,
+        dismissible: true
+    });
 }
