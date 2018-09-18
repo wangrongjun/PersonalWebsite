@@ -10,7 +10,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import javax.validation.ConstraintViolationException;
 
-@Validated
+//@Validated
 public class BaseController {
 
     @ExceptionHandler(value = {Exception.class})
