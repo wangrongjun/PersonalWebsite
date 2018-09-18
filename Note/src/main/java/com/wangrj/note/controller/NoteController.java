@@ -19,8 +19,10 @@ import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * by wangrongjun on 2018/5/31.
@@ -84,7 +86,27 @@ public class NoteController {
 
     @PostMapping("/importFromJson")
     public ResponseEntity<String> importFromJson(@RequestBody List<Note> noteList) {
-        return null;
+        List<String> skipNote = new ArrayList<>();
+        for (Note note : noteList) {
+            note.setNoteId(null);
+            if (noteRepository.findByContent(note.getContent()).size() > 0) {
+                skipNote.add(note.getContent());
+                continue;
+            }
+            noteRepository.save(note);
+        }
+
+        int totalCount = noteList.size();
+        int skipCount = skipNote.size();
+
+        String result = String.format("读取数据 %d 条，导入 %d 条，跳过 %d 条。\n跳过的数据：\n\n%s",
+                totalCount,
+                totalCount - skipCount,
+                skipCount,
+                skipNote.stream().collect(Collectors.joining("\n\n"))
+        );
+
+        return ResponseEntity.ok(result);
     }
 
 }
