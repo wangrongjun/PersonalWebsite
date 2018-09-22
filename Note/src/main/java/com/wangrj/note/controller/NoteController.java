@@ -82,6 +82,9 @@ public class NoteController {
         os.close();
     }
 
+    /**
+     * 访问时，必须把Content-Type设置为application/json，否则会报错（因为没有对应的MessageConverter来处理）
+     */
     @PostMapping(value = "/importFromJson")
     public ResponseEntity<String> importFromJson(@RequestBody List<Note> noteList) {
         List<String> skipNote = new ArrayList<>();
