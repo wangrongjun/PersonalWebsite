@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,8 +26,7 @@ import java.util.stream.Collectors;
 /**
  * by wangrongjun on 2018/5/31.
  */
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/note")
 public class NoteController {
 
@@ -84,12 +82,13 @@ public class NoteController {
         os.close();
     }
 
-    @PostMapping("/importFromJson")
+    @PostMapping(value = "/importFromJson")
     public ResponseEntity<String> importFromJson(@RequestBody List<Note> noteList) {
         List<String> skipNote = new ArrayList<>();
         for (Note note : noteList) {
             note.setNoteId(null);
-            if (noteRepository.findByContent(note.getContent()).size() > 0) {
+            List<Note> simpleNoteList = noteRepository.findByContentAndAndCreatedOn(note.getContent(), note.getCreatedOn());
+            if (simpleNoteList.size() > 0) {
                 skipNote.add(note.getContent());
                 continue;
             }
@@ -99,11 +98,11 @@ public class NoteController {
         int totalCount = noteList.size();
         int skipCount = skipNote.size();
 
-        String result = String.format("读取数据 %d 条，导入 %d 条，跳过 %d 条。\n跳过的数据：\n\n%s",
+        String result = String.format("读取数据 %d 条，导入 %d 条，跳过 %d 条。\n跳过的数据：\n%s",
                 totalCount,
                 totalCount - skipCount,
                 skipCount,
-                skipNote.stream().collect(Collectors.joining("\n\n"))
+                skipNote.stream().collect(Collectors.joining("\n======================\n"))
         );
 
         return ResponseEntity.ok(result);
