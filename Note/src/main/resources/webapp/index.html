@@ -20,8 +20,12 @@
             padding: 0;
         }
 
-        #add_btn {
-            margin-left: 20px;
+        #btn_group {
+            margin: 0 20px;
+        }
+
+        #btn_export {
+            float: right;
         }
 
         .note-item {
@@ -99,7 +103,14 @@
 <div id="root">
 
     <h1 class="text-center">笔记 v1.0</h1>
-    <button id="add_btn" class="btn btn-warning" onclick="$('#add_note_modal').modal('toggle')">添加笔记</button>
+
+    <div id="btn_group">
+        <a id="btn_add" class="btn btn-warning" onclick="$('#add_note_modal').modal('toggle')">添加笔记</a>
+        <div id="btn_export" class="btn-group">
+            <a class="btn btn-default" href="/note/exportJson">导出Json</a>
+            <a class="btn btn-default" href="/note/exportExcel">导出Excel</a>
+        </div>
+    </div>
 
     <transition-group name="list-complete" tag="p">
         <div class="note-item" v-for="note in noteList" :key="note.noteId">

@@ -1,5 +1,9 @@
 package com.wangrj.note.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.wangrj.java_lib.java_util.excel.EntityConverter;
 import com.wangrj.java_lib.java_util.excel.ExcelWriter;
 import com.wangrj.note.entity.Note;
@@ -62,6 +66,25 @@ public class NoteController {
     @DeleteMapping("/{noteId}")
     public void deleteNote(@PathVariable Integer noteId) {
         noteRepository.deleteById(noteId);
+    }
+
+    @GetMapping("/exportJson")
+    public void exportJson(HttpServletResponse response) throws IOException {
+        List<Note> noteList = noteRepository.findAll(new Sort(Sort.Direction.DESC, "createdOn"));
+
+        String noteListJson = JSON.toJSONString(noteList,
+                SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat);
+        if (!noteListJson.contains("\r")) {
+            noteListJson = noteListJson.replace("\n", "\r\n");// 使下载的文本文档可读性更强
+        }
+
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        String jsonFileName = "Note." + time + ".txt";
+        response.setHeader("Content-Disposition", "attachment; filename=" + jsonFileName);
+        ServletOutputStream os = response.getOutputStream();
+        os.write(noteListJson.getBytes("UTF-8"));
+        os.flush();
+        os.close();
     }
 
     @GetMapping("/exportExcel")
