@@ -21,7 +21,7 @@ $(function () {
 });
 
 function toHtml(content) {
-    return content.replace(/(http[s]?:\/\/.+)/g, "<a href='$1' target='_blank'>$1</a>");
+    return content.replace(/(http[s]?:\/\/[^ \n)]+)/g, "<a href='$1' target='_blank'>$1</a>");
 }
 
 function showNoteList() {
