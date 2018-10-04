@@ -5,11 +5,6 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <style>
-        .disable {
-            opacity: 0.1;
-        }
-    </style>
 </head>
 <body>
 
@@ -35,11 +30,11 @@
         try {
             qrCode.makeCode(input); // 生成另外一个二维码
             $errorMsg.innerText = "";
-            $qrCode.className = "";
+            $qrCode.style.opacity = "1";
         } catch (e) {
             qrCode.makeCode("");
             $errorMsg.innerText = e.message;
-            $qrCode.className = "disable";
+            $qrCode.style.opacity = "0.1";
         }
     }
 </script>
