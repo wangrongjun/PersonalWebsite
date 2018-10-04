@@ -42,10 +42,10 @@
             <id>dev</id>
             <properties>
                 <profileActive>dev</profileActive>
-                <activation>
-                    <activeByDefault>true</activeByDefault>
-                </activation>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>prod</id>
