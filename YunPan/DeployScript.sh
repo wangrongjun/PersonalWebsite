@@ -1,6 +1,10 @@
+#!/usr/bin/env bash
 echo git clone https://github.com/wangrongjun/PersonalWebsite.git
 
-ps -aux | grep YunPan.jar | grep -v grep | awk '{print $2}' | xargs kill
+YunPanPid=$(ps -aux | grep YunPan.jar | grep -v grep | awk '{print $2}')
+if [[ "$YunPanPid" != "" ]];
+    then kill ${YunPanPid}
+fi
 
 cd /wrj/src/PersonalWebsite
 git pull
