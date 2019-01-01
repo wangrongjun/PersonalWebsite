@@ -1,7 +1,9 @@
 var rootVm;
 
 $(function () {
-    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+
+    initAxiosLoading();
+    // $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
     rootVm = new Vue({
         el: "#root",
@@ -20,21 +22,53 @@ $(function () {
     showNoteList();
 });
 
+function initAxiosLoading() {
+    axios.interceptors.request.use((config) => {
+        $.blockUI();
+        return config;
+    }, (err) => {
+        $.unblockUI();
+        return Promise.reject(err)
+    });
+    axios.interceptors.response.use((response) => {
+        $.unblockUI();
+        return response;
+    }, (err) => {
+        $.unblockUI();
+        return Promise.reject(err);
+    });
+}
+
 function toHtml(content) {
     return content.replace(/(http[s]?:\/\/[^ \r\n)]+)/g, "<a href='$1' target='_blank'>$1</a>");
 }
 
 function showNoteList() {
-    $.ajax({
-        url: "/note",
-        type: "GET",
-        success: function (result) {
-            rootVm.noteList = result;
-        },
-        error: function (xhr) {
-            alert(xhr.responseText);
-        }
-    });
+    axios.get('/note')
+        .then(function (response) {
+            // handle success
+            console.log(JSON.stringify(response.data));
+            rootVm.noteList = response.data;
+        })
+        .catch(function (error) {
+            // handle error
+            alert(error.response.data);
+            // console.log(error.response.status);// 状态码
+            // console.log(error.response.data);// 错误信息
+        })
+        .then(function () {
+            // always executed
+        });
+    // $.ajax({
+    //     url: "/note",
+    //     type: "GET",
+    //     success: function (result) {
+    //         rootVm.noteList = result;
+    //     },
+    //     error: function (xhr) {
+    //         alert(xhr.responseText);
+    //     }
+    // });
 }
 
 function addNote() {
