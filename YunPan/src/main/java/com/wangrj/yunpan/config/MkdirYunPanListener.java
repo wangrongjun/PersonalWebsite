@@ -25,10 +25,14 @@ public class MkdirYunPanListener implements ApplicationListener<ContextRefreshed
         File rootFile = new File(rootPath);
         File tempFile = new File(tempPath);
         if (!rootFile.exists()) {
-            assert rootFile.mkdirs();
+            if (!rootFile.mkdirs()) {
+                throw new IllegalStateException(rootPath + " mkdirs fail");
+            }
         }
         if (!tempFile.exists()) {
-            assert tempFile.mkdirs();
+            if (!tempFile.mkdirs()) {
+                throw new IllegalStateException(tempFile + " mkdirs fail");
+            }
         }
         logger.info("dir created!");
     }
